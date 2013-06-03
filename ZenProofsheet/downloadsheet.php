@@ -1,5 +1,4 @@
 <?php 
-//echo (var_export( $_POST, true ));
 $dir        = str_replace( '\\', '/', realpath( dirname( __FILE__ ) ) );
 define( 'SERVERPATH', str_replace( '/plugins/ZenProofsheet', '', $dir ) );
 require_once( SERVERPATH . '/zp-core/functions.php' );
@@ -81,7 +80,7 @@ $images = $albumobject->getImages();
      * format the proof sheet.  If you'd like to tweak the formatting, here's
      * where to do it.
      */
-    switch(getOption('zenproofsheet_size')) {
+    switch(getOption('zenproofsheet_pagesize')) {
       case "LTR":
         // Setup for LTR 8.5" x 11" paper (215.9mm x 279.4mm)
         $cfg = array(
@@ -165,10 +164,8 @@ $images = $albumobject->getImages();
             'g'          =>       0, // Green 0-255
             'b'          =>     255),// Blue 0-255
         );
-     // default:
-       // throw new Kohana_Exception('unhandled page type: '.$page_type);
     }
-//echo var_export( $cfg, true );
+
  // Here are some other parameters that need defining
     $cfg['footerTextPage']       = 'Page ';   // Note that this text isn't autofixed by translate module
     $cfg['footerTextSlash']      = ' / ';
@@ -216,8 +213,6 @@ makeAlbumCurrent( $albumobject );
     foreach($images as $image) {
 	$imgpath = ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$image;
 	$imgurl = FULLWEBPATH.'/'.$albumobject->getFolder().'/'.$image;
-	$zensignature_ss_size_w=800;
-$zensignature_ss_size_h=600;
 
 $headerText = $albumobject->getTitle();
 $headerLink = FULLWEBPATH.'/'.$albumobject->getFolder();
@@ -228,10 +223,7 @@ $headerLink = FULLWEBPATH.'/'.$albumobject->getFolder();
 			 'id' => $_zp_current_image->getID(),
 			'albumid' => $_zp_current_image->getAlbum()->getID(),
 			'name' => $_zp_current_image->filename,
-			'resize' => $_zp_current_image->getCustomImage(null,$zensignature_ss_size_w,$zensignature_ss_size_h,$zensignature_ss_size_w,$zensignature_ss_size_h,null,null,true),
-			//'resize' => $_zp_current_image->getSizedImage(800), with watermark
-			//'resize' => getURL($_zp_current_image), with watermark
-			'resize2' => getURL($_zp_current_image),
+			'resize' => $_zp_current_image->getCustomImage(getOption('zenproofsheet_imgsize'),null,null,null,null,null,null,true),
 			'url' => ( $_zp_current_image->album->name ) . '&image=' . urlencode( $_zp_current_image->filename ) 
 		);
 		} 
@@ -249,7 +241,7 @@ $headerLink = FULLWEBPATH.'/'.$albumobject->getFolder();
       $x = $cfg['marginL'] + ($cfg['imageSizeW']+$cfg['imageSpaceW']) * (      $i                    % $cfg['imageNumW']);
       $y = $cfg['marginT'] + ($cfg['imageSizeH']+$cfg['imageSpaceH']) * (floor($i/$cfg['imageNumW']) % $cfg['imageNumH']);
       $pdf->printImage(FULLWEBPATH.str_replace(' ', '%20', $list['resize']), $x, $y, $cfg['imageSizeW'], $cfg['imageSizeH'], null);
-      $pdf->printText($image, $cfg['captionFont'], $x, $y+$cfg['imageSizeH']+$cfg['captionSpace'], $cfg['captionW'], $cfg['captionH'], $imgurl);
+      $pdf->printText(preg_replace("/\\.[^.\\s]{3,4}$/", "", $image), $cfg['captionFont'], $x, $y+$cfg['imageSizeH']+$cfg['captionSpace'], $cfg['captionW'], $cfg['captionH'], $imgurl);
       // Increment index and loop
 	  //echo $list['resize2'].'<br>';
 	  //echo var_export( getimagesize(FULLWEBPATH.str_replace(' ', '%20', $list['resize'])), true ).'<br>';
@@ -257,7 +249,6 @@ $headerLink = FULLWEBPATH.'/'.$albumobject->getFolder();
 }
 $filename = $albumobject->getTitle().'.pdf';
 $pdfstring = $pdf->Output(ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$albumobject->getTitle().'.pdf','F');
-//$pdfstring;
 
     ob_start();
 $filedwn = ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$albumobject->getTitle().'.pdf';
