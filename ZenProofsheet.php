@@ -1,4 +1,8 @@
 <?php
+//include(dirname(__FILE__).'/ZenProofsheet/downloadsheet.php');
+//ini_set( 'max_execution_time', 60 );
+ini_set( "display_errors", "1" );
+error_reporting( E_ALL );
 /**
  * 
 Proof Sheet is a plugin for Zenphoto which will allow you to a to generate PDF proof sheet/s in A4 or LTR size paper in landscape or portrait orientation.
@@ -32,16 +36,21 @@ class ZenProofSheetOptions {
 function handleOption($option, $currentValue) {
 }
 	function ZenProofSheetOptions() {
-		setOptionDefault('zenproofsheet_size', 'A4');
+		setOptionDefault('zenproofsheet_pagesize', 'A4');
+		setOptionDefault('zenproofsheet_imgsize', '1024');
 	}
 
 	function getOptionsSupported() {
 		return array(										
 									
-	gettext('Paper Size') => array('key' => 'zenproofsheet_size', 'type' => OPTION_TYPE_SELECTOR, 
+	gettext('Paper Size') => array('key' => 'zenproofsheet_pagesize', 'type' => OPTION_TYPE_SELECTOR, 
 				'order' => 1,
 				'selections' => array(gettext('A4') => 'A4', gettext('LTR') => 'LTR'),
-				'desc' => gettext('Select the desired paper size')),	
+				'desc' => gettext('Select the desired paper size')),
+gettext('Image Quality ') => array('key' => 'zenproofsheet_imgsize',
+										'order'=> 2, 
+										'type' => OPTION_TYPE_TEXTBOX,
+										'desc' => gettext("controls image quality if you increase the number it will make a bigger PDF file")),				
 		);
 	}
 }
@@ -49,12 +58,7 @@ function handleOption($option, $currentValue) {
 function printProofSheet() {
 global $_zp_current_album;
 $albumID = $_zp_current_album->getID();
-//<form action="<?php SERVERPATH.'/'.USER_PLUGIN_FOLDER.'/ZenProofsheet/downloadsheet.php'  method="post">
- // <input type="button" value="Download Contact Sheet" /><form method="POST" action="<?php echo FULLWEBPATH.'/albums/'.$_zp_current_album->getFolder().'/'.$_zp_current_album->getTitle().'.pdf'; "></form>
- $pdfdwn = "/albums/".$_zp_current_album->getFolder()."/".$_zp_current_album->getTitle().".pdf";
- $pdfurl = '/plugins/ZenProofsheet/downloadsheet.php';
- $pdfattrib = '?albumobject='.$_zp_current_album->getID();
- $met = 'albumobject='.$albumID;
+ $pdfmet = 'albumobject='.$albumID;
 ?>
 		<script type="text/javascript">
 
@@ -77,7 +81,7 @@ jQuery.download = function(url, data, method){
 		.appendTo('body').submit().remove();
 	};
 };
-$.download('/plugins/ZenProofsheet/downloadsheet.php', '<?php echo $met; ?>', 'POST');
+$.download('/plugins/ZenProofsheet/downloadsheet.php', '<?php echo $pdfmet; ?>', 'POST');
 }
 
 </script>
