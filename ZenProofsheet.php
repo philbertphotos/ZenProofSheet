@@ -1,8 +1,4 @@
 <?php
-//include(dirname(__FILE__).'/ZenProofsheet/downloadsheet.php');
-//ini_set( 'max_execution_time', 60 );
-ini_set( "display_errors", "1" );
-error_reporting( E_ALL );
 /**
  * 
 Proof Sheet is a plugin for Zenphoto which will allow you to a to generate PDF proof sheet/s in A4 or LTR size paper in landscape or portrait orientation.
