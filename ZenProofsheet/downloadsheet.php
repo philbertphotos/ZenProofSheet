@@ -1,7 +1,5 @@
 <?php 
-ini_set( "display_errors", "1" );
-error_reporting( E_ALL );
-
+//echo (var_export( $_POST, true ));
 $dir        = str_replace( '\\', '/', realpath( dirname( __FILE__ ) ) );
 define( 'SERVERPATH', str_replace( '/plugins/ZenProofsheet', '', $dir ) );
 require_once( SERVERPATH . '/zp-core/functions.php' );
@@ -11,7 +9,7 @@ require_once( SERVERPATH . '/zp-core/lib-auth.php' );
 require_once(SERVERPATH.'/plugins/ZenProofsheet/fpdf/fpdf.php');
 
 global $_zp_current_album, $_zp_current_image;
-$albumobject = getItemByID( "albums", $_GET['albumobject'] );
+$albumobject = getItemByID( "albums", $_POST['albumobject'] );
 
 
 class proofsheet_PDF extends FPDF {
@@ -257,8 +255,9 @@ $headerLink = FULLWEBPATH.'/'.$albumobject->getFolder();
 	  //echo var_export( getimagesize(FULLWEBPATH.str_replace(' ', '%20', $list['resize'])), true ).'<br>';
       $i++;
 }
+$filename = $albumobject->getTitle().'.pdf';
 $pdfstring = $pdf->Output(ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$albumobject->getTitle().'.pdf','F');
-$pdfstring;
+//$pdfstring;
 
     ob_start();
 $filedwn = ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$albumobject->getTitle().'.pdf';
@@ -266,17 +265,16 @@ $filedwn = ALBUM_FOLDER_SERVERPATH.$albumobject->getFolder().'/'.$albumobject->g
     if (file_exists($filedwn)) 
     {
         header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename='.basename($filedwn));
+		header('Content-type: application/pdf');
+        header('Content-Disposition: attachment; filename="'.$filename.'"');
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($filedwn));
+        header('Content-Length: ' .filesize($filedwn));
         ob_clean();
         flush();
         readfile($filedwn);
-		echo 'true';
         exit();
     }
 ?>
